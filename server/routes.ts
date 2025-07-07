@@ -409,6 +409,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/chat/members/:roomId", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const roomId = parseInt(req.params.roomId);
+      const members = await storage.getRoomMembers(roomId);
+      res.json(members);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/chat/kick/:roomId/:userId", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const roomId = parseInt(req.params.roomId);
+      const userIdToKick = parseInt(req.params.userId);
+      
+      // Check if the room exists and is not general chat (can't kick from general)
+      const rooms = await storage.getChatRooms();
+      const room = rooms.find(r => r.id === roomId);
+      
+      if (!room) {
+        return res.status(404).json({ message: "Чат не найден" });
+      }
+
+      if (room.isGeneral) {
+        return res.status(400).json({ message: "Нельзя исключить из общего чата" });
+      }
+
+      // Don't allow kicking yourself
+      if (userIdToKick === req.user!.id) {
+        return res.status(400).json({ message: "Нельзя исключить самого себя" });
+      }
+
+      await storage.kickUserFromRoom(userIdToKick, roomId);
+      
+      // Notify the kicked user via WebSocket
+      broadcastToRoom(roomId, {
+        type: "user_kicked",
+        userId: userIdToKick,
+        roomId: roomId,
+        message: "Вы были исключены из чата"
+      });
+      
+      res.json({ message: "Пользователь исключен из чата" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // File upload route
   app.post("/api/upload", authenticateToken, upload.single("file"), async (req: AuthenticatedRequest, res) => {
     try {

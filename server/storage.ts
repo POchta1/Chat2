@@ -36,6 +36,8 @@ export interface IStorage {
   updateChatRoom(roomId: number, data: { name?: string }): Promise<ChatRoom>;
   deleteChatRoom(roomId: number): Promise<void>;
   joinRoom(userId: number, roomId: number): Promise<void>;
+  kickUserFromRoom(userId: number, roomId: number): Promise<void>;
+  getRoomMembers(roomId: number): Promise<User[]>;
   
   // Message operations
   getMessages(roomId: number, limit?: number): Promise<Message[]>;
@@ -258,6 +260,28 @@ export class MemStorage implements IStorage {
   async joinRoom(userId: number, roomId: number): Promise<void> {
     const key = `${userId}-${roomId}`;
     this.roomMembers.set(key, { userId, roomId });
+  }
+
+  async kickUserFromRoom(userId: number, roomId: number): Promise<void> {
+    const key = `${userId}-${roomId}`;
+    this.roomMembers.delete(key);
+    
+    // Also clear typing status for kicked user
+    const typingKey = `${userId}-${roomId}`;
+    this.typingIndicators.delete(typingKey);
+  }
+
+  async getRoomMembers(roomId: number): Promise<User[]> {
+    const members: User[] = [];
+    for (const member of this.roomMembers.values()) {
+      if (member.roomId === roomId) {
+        const user = await this.getUser(member.userId);
+        if (user) {
+          members.push(user);
+        }
+      }
+    }
+    return members;
   }
 
   async getMessages(roomId: number, limit = 50): Promise<Message[]> {

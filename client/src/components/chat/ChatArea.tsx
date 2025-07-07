@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Phone, Video, MoreVertical, Shield, Lock, Settings, Users, UserPlus, Info } from 'lucide-react';
+import { Phone, Video, MoreVertical, Shield, Lock, Settings, Users, UserPlus, Info, UserX } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -33,6 +34,8 @@ export default function ChatArea({
   onDeleteRoom,
 }: ChatAreaProps) {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showMembersModal, setShowMembersModal] = useState(false);
+  const [roomMembers, setRoomMembers] = useState<any[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -71,6 +74,54 @@ export default function ChatArea({
     });
     // Here you would implement actual audio call functionality
     // For now, we'll just show a notification
+  };
+
+  const handleShowMembers = async () => {
+    if (!room) return;
+    
+    try {
+      const response = await apiRequest('GET', `/api/chat/members/${room.id}`);
+      if (response.ok) {
+        const members = await response.json();
+        setRoomMembers(members);
+        setShowMembersModal(true);
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить список участников",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleKickUser = async (userId: number, username: string) => {
+    if (!room) return;
+    
+    try {
+      const response = await apiRequest('POST', `/api/chat/kick/${room.id}/${userId}`, {});
+      if (response.ok) {
+        toast({
+          title: "Успешно",
+          description: `Пользователь ${username} исключен из чата`,
+        });
+        // Refresh members list
+        handleShowMembers();
+      } else {
+        const error = await response.json();
+        toast({
+          title: "Ошибка",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось исключить пользователя",
+        variant: "destructive",
+      });
+    }
   };
 
   const renderMessage = (message: Message) => {
@@ -241,9 +292,12 @@ export default function ChatArea({
                   <span>Настройки чата</span>
                 </DropdownMenuItem>
                 
-                <DropdownMenuItem className="cursor-pointer hover:bg-slate-700">
+                <DropdownMenuItem 
+                  onClick={handleShowMembers}
+                  className="cursor-pointer hover:bg-slate-700"
+                >
                   <Users className="mr-2 h-4 w-4" />
-                  <span>Участники ({messages.filter((m, i, arr) => arr.findIndex(msg => msg.senderId === m.senderId) === i).length})</span>
+                  <span>Участники</span>
                 </DropdownMenuItem>
                 
                 <DropdownMenuSeparator className="bg-slate-600" />
@@ -306,6 +360,65 @@ export default function ChatArea({
           onUpdateRoom={onUpdateRoom}
           onDeleteRoom={onDeleteRoom}
         />
+      )}
+
+      {/* Members Modal */}
+      {showMembersModal && room && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-800 rounded-2xl p-6 w-full max-w-md border border-slate-700">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-white">Участники чата</h3>
+              <Button
+                onClick={() => setShowMembersModal(false)}
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white"
+              >
+                ×
+              </Button>
+            </div>
+
+            <div className="space-y-3 max-h-80 overflow-y-auto">
+              {roomMembers.map((member) => (
+                <div key={member.id} className="flex items-center justify-between p-3 bg-slate-700 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src={member.avatar || undefined} />
+                      <AvatarFallback className="bg-slate-600 text-white">
+                        {member.username[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium text-white">{member.username}</p>
+                      <p className="text-sm text-gray-400">
+                        {member.id === currentUser?.id ? 'Вы' : 'Участник'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Only show kick button if it's not the current user and not in general chat */}
+                  {member.id !== currentUser?.id && !room.isGeneral && (
+                    <Button
+                      onClick={() => handleKickUser(member.id, member.username)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                      title="Исключить из чата"
+                    >
+                      <UserX className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+              
+              {roomMembers.length === 0 && (
+                <div className="text-center py-8">
+                  <p className="text-gray-400">Нет участников</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

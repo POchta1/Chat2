@@ -35,6 +35,7 @@ This is a secure, real-time chat application built with React, Express, and Post
 - **Typing Indicators**: Real-time typing status updates
 - **Online Status**: User presence tracking
 - **Message Delivery**: Instant message delivery with connection state management
+- **User Moderation**: Real-time kick notifications and member management
 
 ### Database Schema
 - **Users**: User accounts with authentication and profile data
@@ -49,6 +50,12 @@ This is a secure, real-time chat application built with React, Express, and Post
 - **File Storage**: Local filesystem storage with organized directory structure
 - **File Types**: Validation for allowed file types (images, videos, documents)
 - **File Metadata**: Storage of file names, sizes, and URLs
+
+### User Moderation
+- **Room Member Management**: View all members in chat rooms
+- **Kick Functionality**: Remove problematic users from private chats
+- **Protected General Chat**: Cannot kick users from the main general chat
+- **Real-time Notifications**: Kicked users receive immediate WebSocket notifications
 
 ## Data Flow
 
@@ -126,6 +133,7 @@ Changelog:
 - July 07, 2025. Successfully migrated from Replit Agent to standard Replit environment
 - July 07, 2025. Fixed authentication redirect issue - users now automatically navigate to chat after login/registration
 - July 07, 2025. Migration completed successfully - chat application fully functional with profile updates, file uploads, and real-time messaging
+- July 07, 2025. Added user kick functionality for chat moderation - users can view room members and kick inappropriate users from non-general chats
 ```
 
 ## User Preferences

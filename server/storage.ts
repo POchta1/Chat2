@@ -28,7 +28,7 @@ export interface IStorage {
   validateSecretKey(key: string): Promise<boolean>;
   markSecretKeyAsUsed(key: string, userId: number): Promise<void>;
   initializeSecretKeys(): Promise<void>;
-  getAvailableWords(): string[];
+  getAvailableKeys(): string[];
   
   // Chat room operations
   getChatRooms(): Promise<ChatRoom[]>;
@@ -54,7 +54,6 @@ export class MemStorage implements IStorage {
   private messages: Map<number, Message> = new Map();
   private roomMembers: Map<string, { userId: number; roomId: number }> = new Map();
   private typingIndicators: Map<string, { userId: number; roomId: number; isTyping: boolean }> = new Map();
-  private availableWords: string[] = [];
   private currentUserId = 1;
   private currentRoomId = 1;
   private currentMessageId = 1;
@@ -132,71 +131,35 @@ export class MemStorage implements IStorage {
   }
 
   async validateSecretKey(key: string): Promise<boolean> {
-    // Разделяем ключ на слова
-    const words = key.split('-');
-    
-    // Проверяем, что выбрано ровно 10 слов
-    if (words.length !== 10) {
-      return false;
-    }
-    
-    // Проверяем, что все слова есть в доступном списке
-    const validWords = words.every(word => this.availableWords.includes(word));
-    if (!validWords) {
-      return false;
-    }
-    
-    // Проверяем, что этот ключ еще не использовался
     const secretKey = this.secretKeys.get(key);
-    return secretKey ? !secretKey.isUsed : true; // Если ключ новый, он валидный
+    return secretKey ? !secretKey.isUsed : false;
   }
 
   async markSecretKeyAsUsed(key: string, userId: number): Promise<void> {
-    let secretKey = this.secretKeys.get(key);
-    
-    // Если ключ не существует, создаем новый
-    if (!secretKey) {
-      secretKey = {
-        id: this.currentSecretKeyId++,
-        key: key,
-        isUsed: false,
-        usedBy: null,
-        createdAt: new Date(),
-      };
+    const secretKey = this.secretKeys.get(key);
+    if (secretKey) {
+      secretKey.isUsed = true;
+      secretKey.usedBy = userId;
+      this.secretKeys.set(key, secretKey);
     }
-    
-    // Отмечаем как использованный
-    secretKey.isUsed = true;
-    secretKey.usedBy = userId;
-    this.secretKeys.set(key, secretKey);
   }
 
   async initializeSecretKeys(): Promise<void> {
-    // Создаем большой список слов для выбора
-    const words = [
-      "солнце", "море", "дом", "мир", "свет", "небо", "земля", "вода", "огонь", "ветер",
-      "лес", "гора", "река", "город", "дорога", "звезда", "луна", "цветок", "дерево", "трава",
-      "птица", "рыба", "кот", "собака", "конь", "волк", "медведь", "лиса", "заяц", "белка",
-      "книга", "письмо", "слово", "музыка", "песня", "танец", "смех", "радость", "счастье", "любовь",
-      "друг", "семья", "мама", "папа", "брат", "сестра", "дедушка", "бабушка", "ребенок", "человек",
-      "работа", "учеба", "школа", "дом", "квартира", "комната", "кухня", "спальня", "окно", "дверь",
-      "утро", "день", "вечер", "ночь", "время", "год", "месяц", "неделя", "час", "минута",
-      "зима", "весна", "лето", "осень", "снег", "дождь", "солнце", "облако", "туман", "радуга",
-      "хлеб", "молоко", "мясо", "овощи", "фрукты", "чай", "кофе", "сахар", "соль", "масло",
-      "красный", "синий", "зеленый", "желтый", "белый", "черный", "серый", "коричневый", "розовый", "фиолетовый"
+    // Создаем 10 фиксированных секретных ключей
+    const secretKeys = [
+      "SK-7H9J2K8L3M4N5P6Q",
+      "SK-R2T4Y6U8I9O0P1A3", 
+      "SK-S5D7F9G1H3J4K6L8",
+      "SK-Z9X8C7V6B5N4M3Q2",
+      "SK-W1E3R5T7Y9U2I4O6",
+      "SK-P8O9I0U7Y6T5R4E3",
+      "SK-A2S4D6F8G9H1J3K5",
+      "SK-L7Z9X2C4V6B8N0M1",
+      "SK-Q3W5E7R9T1Y3U5I7",
+      "SK-O9P1A3S5D7F9G2H4"
     ];
 
-    // Сохраняем полный список слов для API
-    this.availableWords = words;
-
-    // Генерируем несколько комбинаций для тестирования
-    const testCombinations = [
-      "солнце-море-дом-мир-свет-небо-земля-вода-огонь-ветер",
-      "лес-гора-река-город-дорога-звезда-луна-цветок-дерево-трава",
-      "птица-рыба-кот-собака-конь-волк-медведь-лиса-заяц-белка"
-    ];
-
-    testCombinations.forEach((keyString, index) => {
+    secretKeys.forEach((keyString, index) => {
       const secretKey: SecretKey = {
         id: this.currentSecretKeyId++,
         key: keyString,
@@ -208,9 +171,11 @@ export class MemStorage implements IStorage {
     });
   }
 
-  // Метод для получения доступных слов
-  getAvailableWords(): string[] {
-    return this.availableWords || [];
+  // Метод для получения доступных ключей
+  getAvailableKeys(): string[] {
+    return Array.from(this.secretKeys.values())
+      .filter(key => !key.isUsed)
+      .map(key => key.key);
   }
 
   async getChatRooms(): Promise<ChatRoom[]> {

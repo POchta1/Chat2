@@ -126,7 +126,7 @@ export default function AuthPage() {
 
   return (
     <div className="auth-container">
-      <Card className="auth-card">
+      <Card className="w-full max-w-md mx-auto bg-slate-900 border-slate-700 shadow-2xl">
         <CardHeader className="text-center">
           <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-white" />

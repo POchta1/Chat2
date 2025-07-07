@@ -127,8 +127,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
           case "message":
             if (userId && currentRoomId) {
+              console.log('Получено сообщение от пользователя:', userId, 'в комнату:', currentRoomId, 'содержание:', message.content);
+              
               const newMessage = await storage.createMessage({
-                content: message.content,
+                content: message.content, // Сохраняем как есть, без шифрования
                 senderId: userId,
                 roomId: currentRoomId,
                 messageType: message.messageType || "text",
@@ -139,14 +141,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               const sender = await storage.getUser(userId);
               
+              console.log('Отправляем сообщение в комнату:', currentRoomId);
+              
               broadcastToRoom(currentRoomId, {
                 type: "new_message",
-                message: newMessage,
-                sender: {
-                  id: sender!.id,
-                  username: sender!.username,
-                  avatar: sender!.avatar,
-                },
+                message: {
+                  ...newMessage,
+                  sender: {
+                    id: sender!.id,
+                    username: sender!.username,
+                    avatar: sender!.avatar,
+                  }
+                }
               });
             }
             break;

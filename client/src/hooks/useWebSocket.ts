@@ -18,17 +18,26 @@ export function useWebSocket(url: string, userId?: number): UseWebSocketReturn {
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef(0);
-  const maxReconnectAttempts = 5;
+  const maxReconnectAttempts = 3; // Уменьшаем количество попыток
+  const socketRef = useRef<WebSocket | null>(null);
+  const isConnectingRef = useRef(false);
 
   const connect = useCallback(() => {
-    if (socket?.readyState === WebSocket.OPEN) {
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
       return;
     }
 
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
-    
-    const ws = new WebSocket(wsUrl);
+    // Закрываем предыдущее соединение если есть
+    if (socketRef.current) {
+      socketRef.current.close();
+    }
+
+    try {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${protocol}//${window.location.host}/ws`;
+      
+      const ws = new WebSocket(wsUrl);
+      socketRef.current = ws;
     
     ws.onopen = () => {
       console.log('WebSocket connected');
@@ -73,10 +82,14 @@ export function useWebSocket(url: string, userId?: number): UseWebSocketReturn {
   }, [userId, socket]);
 
   const sendMessage = useCallback((message: WebSocketMessage) => {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify(message));
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      console.log('Отправляем WebSocket сообщение:', message);
+      socketRef.current.send(JSON.stringify(message));
+    } else {
+      console.log('WebSocket не подключен, пытаемся переподключиться...');
+      connect();
     }
-  }, [socket]);
+  }, [connect]);
 
   useEffect(() => {
     if (userId) {
@@ -87,8 +100,9 @@ export function useWebSocket(url: string, userId?: number): UseWebSocketReturn {
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
       }
-      if (socket) {
-        socket.close();
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
       }
     };
   }, [userId, connect]);

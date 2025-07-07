@@ -135,7 +135,7 @@ Changelog:
 - July 07, 2025. Migration completed successfully - chat application fully functional with profile updates, file uploads, and real-time messaging
 - July 07, 2025. Added user kick functionality for chat moderation - users can view room members and kick inappropriate users from non-general chats
 - July 07, 2025. Implemented persistent file-based storage system - messages and data now persist after page refresh using data/storage.json
-- July 07, 2025. Fixed login issues by providing clear guidance on available secret keys (SECRET_KEY_002 through SECRET_KEY_010)
+- July 07, 2025. Reverted to original secure secret key system - keys are not displayed to users for maximum security
 ```
 
 ## User Preferences

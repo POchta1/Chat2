@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { User, LogOut, Settings, Plus, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import LogoutConfirmModal from './LogoutConfirmModal';
 import type { ChatRoom } from '@/pages/chat';
 import type { User as UserType } from '@/hooks/useAuth';
 
@@ -21,6 +23,16 @@ export default function ChatSidebar({
   onLogout, 
   user 
 }: ChatSidebarProps) {
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    setShowLogoutModal(false);
+    onLogout();
+  };
   return (
     <div className="chat-sidebar">
       {/* User Profile Header */}
@@ -104,7 +116,7 @@ export default function ChatSidebar({
             Новый чат
           </Button>
           <Button
-            onClick={onLogout}
+            onClick={handleLogoutClick}
             variant="outline"
             className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-gray-300 border-slate-600"
           >
@@ -112,6 +124,12 @@ export default function ChatSidebar({
           </Button>
         </div>
       </div>
+
+      <LogoutConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogoutConfirm}
+      />
     </div>
   );
 }

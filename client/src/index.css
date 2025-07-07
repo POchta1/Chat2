@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* Chat theme colors */
+  --chat-dark: hsl(220, 39%, 11%);
+  --chat-darker: hsl(220, 84%, 4%);
+  --chat-accent: hsl(217, 91%, 60%);
+  --chat-success: hsl(150, 86%, 65%);
+  --chat-danger: hsl(0, 84%, 60%);
+  --chat-warning: hsl(43, 96%, 56%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background-color: var(--chat-darker);
+    color: white;
+  }
+}
+
+@layer components {
+  .chat-container {
+    @apply min-h-screen flex;
+    background-color: var(--chat-darker);
+  }
+
+  .chat-sidebar {
+    @apply w-80 flex flex-col;
+    background-color: var(--chat-dark);
+    border-right: 1px solid hsl(240, 3.7%, 15.9%);
+  }
+
+  .chat-main {
+    @apply flex-1 flex flex-col;
+  }
+
+  .chat-header {
+    @apply p-4 border-b;
+    background-color: var(--chat-dark);
+    border-bottom: 1px solid hsl(240, 3.7%, 15.9%);
+  }
+
+  .chat-messages {
+    @apply flex-1 overflow-y-auto p-4 space-y-4;
+  }
+
+  .chat-input-area {
+    @apply p-4 border-t;
+    border-top: 1px solid hsl(240, 3.7%, 15.9%);
+  }
+
+  .message-bubble {
+    @apply p-3 rounded-lg max-w-md;
+  }
+
+  .message-bubble.own {
+    @apply ml-auto;
+    background-color: var(--chat-accent);
+    color: white;
+  }
+
+  .message-bubble.other {
+    @apply bg-slate-700 text-white;
+  }
+
+  .typing-indicator {
+    @apply flex space-x-1;
+  }
+
+  .typing-dot {
+    @apply w-2 h-2 bg-gray-400 rounded-full animate-pulse;
+  }
+
+  .online-status {
+    @apply w-2 h-2 rounded-full;
+    background-color: var(--chat-success);
+  }
+
+  .auth-container {
+    @apply min-h-screen flex items-center justify-center p-4;
+    background-color: var(--chat-darker);
+  }
+
+  .auth-card {
+    @apply rounded-2xl shadow-2xl p-8 w-full max-w-md border;
+    background-color: var(--chat-dark);
+    border-color: hsl(240, 3.7%, 15.9%);
+  }
+
+  .chat-button {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors;
+  }
+
+  .chat-button.primary {
+    background-color: var(--chat-accent);
+    color: white;
+  }
+
+  .chat-button.primary:hover {
+    background-color: hsl(217, 91%, 50%);
+  }
+
+  .chat-button.success {
+    background-color: var(--chat-success);
+    color: white;
+  }
+
+  .chat-button.success:hover {
+    background-color: hsl(150, 86%, 55%);
+  }
+
+  .chat-input {
+    @apply w-full px-4 py-3 rounded-lg border text-white;
+    background-color: hsl(240, 3.7%, 15.9%);
+    border-color: hsl(240, 3.7%, 25.9%);
+  }
+
+  .chat-input:focus {
+    outline: none;
+    border-color: var(--chat-accent);
+    box-shadow: 0 0 0 2px hsl(217, 91%, 60%, 0.2);
+  }
+}
+
+@layer utilities {
+  .animate-typing {
+    animation: typing 1.5s infinite;
+  }
+
+  @keyframes typing {
+    0%, 20% { opacity: 0.4; }
+    50% { opacity: 1; }
+    80%, 100% { opacity: 0.4; }
+  }
+}

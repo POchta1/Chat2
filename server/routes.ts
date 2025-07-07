@@ -329,6 +329,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/chat/rooms/:roomId", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const roomId = parseInt(req.params.roomId);
+      const { name } = req.body;
+      
+      if (!name || typeof name !== 'string' || !name.trim()) {
+        return res.status(400).json({ message: "Название чата обязательно" });
+      }
+
+      const room = await storage.updateChatRoom(roomId, { name: name.trim() });
+      
+      res.json({ 
+        message: "Чат обновлен успешно", 
+        room 
+      });
+    } catch (error: any) {
+      console.error("Error updating room:", error);
+      res.status(500).json({ message: "Не удалось обновить чат" });
+    }
+  });
+
+  app.delete("/api/chat/rooms/:roomId", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const roomId = parseInt(req.params.roomId);
+      
+      // Проверяем, что это не общий чат
+      const rooms = await storage.getChatRooms();
+      const room = rooms.find(r => r.id === roomId);
+      
+      if (!room) {
+        return res.status(404).json({ message: "Чат не найден" });
+      }
+
+      if (room.isGeneral) {
+        return res.status(400).json({ message: "Общий чат нельзя удалить" });
+      }
+
+      await storage.deleteChatRoom(roomId);
+      
+      res.json({ 
+        message: "Чат удален успешно" 
+      });
+    } catch (error: any) {
+      console.error("Error deleting room:", error);
+      res.status(500).json({ message: "Не удалось удалить чат" });
+    }
+  });
+
   app.get("/api/chat/messages/:roomId", authenticateToken, async (req: AuthenticatedRequest, res) => {
     try {
       const roomId = parseInt(req.params.roomId);

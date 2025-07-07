@@ -33,6 +33,8 @@ export interface IStorage {
   // Chat room operations
   getChatRooms(): Promise<ChatRoom[]>;
   createChatRoom(name: string, isGeneral?: boolean): Promise<ChatRoom>;
+  updateChatRoom(roomId: number, data: { name?: string }): Promise<ChatRoom>;
+  deleteChatRoom(roomId: number): Promise<void>;
   joinRoom(userId: number, roomId: number): Promise<void>;
   
   // Message operations
@@ -191,6 +193,66 @@ export class MemStorage implements IStorage {
     };
     this.chatRooms.set(room.id, room);
     return room;
+  }
+
+  async updateChatRoom(roomId: number, data: { name?: string }): Promise<ChatRoom> {
+    const room = this.chatRooms.get(roomId);
+    if (!room) {
+      throw new Error('Чат не найден');
+    }
+
+    if (room.isGeneral) {
+      throw new Error('Общий чат нельзя редактировать');
+    }
+
+    const updatedRoom: ChatRoom = {
+      ...room,
+      ...data,
+    };
+
+    this.chatRooms.set(roomId, updatedRoom);
+    return updatedRoom;
+  }
+
+  async deleteChatRoom(roomId: number): Promise<void> {
+    const room = this.chatRooms.get(roomId);
+    if (!room) {
+      throw new Error('Чат не найден');
+    }
+
+    if (room.isGeneral) {
+      throw new Error('Общий чат нельзя удалить');
+    }
+
+    // Удаляем чат
+    this.chatRooms.delete(roomId);
+
+    // Удаляем все сообщения из чата
+    const messagesToDelete: number[] = [];
+    this.messages.forEach((message, id) => {
+      if (message.roomId === roomId) {
+        messagesToDelete.push(id);
+      }
+    });
+    messagesToDelete.forEach(id => this.messages.delete(id));
+
+    // Удаляем участников чата
+    const membersToDelete: string[] = [];
+    this.roomMembers.forEach((member, key) => {
+      if (member.roomId === roomId) {
+        membersToDelete.push(key);
+      }
+    });
+    membersToDelete.forEach(key => this.roomMembers.delete(key));
+
+    // Удаляем индикаторы печати
+    const typingToDelete: string[] = [];
+    this.typingIndicators.forEach((typing, key) => {
+      if (typing.roomId === roomId) {
+        typingToDelete.push(key);
+      }
+    });
+    typingToDelete.forEach(key => this.typingIndicators.delete(key));
   }
 
   async joinRoom(userId: number, roomId: number): Promise<void> {

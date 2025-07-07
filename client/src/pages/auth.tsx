@@ -122,18 +122,29 @@ export default function AuthPage() {
                 <Label htmlFor="secretKey" className="text-sm font-medium text-gray-300">
                   Секретный ключ
                 </Label>
-                <Input
-                  id="secretKey"
-                  name="secretKey"
-                  type="text"
-                  value={formData.secretKey}
-                  onChange={handleInputChange}
-                  className="bg-slate-800 border-slate-600 text-gray-100 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 font-mono"
-                  placeholder="Введите секретный ключ"
-                  required={!isLogin}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="secretKey"
+                    name="secretKey"
+                    type="text"
+                    value={formData.secretKey}
+                    onChange={handleInputChange}
+                    className="bg-slate-800 border-slate-600 text-gray-100 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 font-mono flex-1"
+                    placeholder="Введите секретный ключ"
+                    required={!isLogin}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setFormData(prev => ({ ...prev, secretKey: 'SECRET_KEY_002' }))}
+                    className="whitespace-nowrap bg-slate-700 border-slate-600 hover:bg-slate-600"
+                  >
+                    KEY_002
+                  </Button>
+                </div>
                 <p className="text-xs text-gray-400 mt-1">
-                  Для регистрации требуется секретный ключ
+                  Доступные ключи: SECRET_KEY_002, SECRET_KEY_003, SECRET_KEY_004...SECRET_KEY_010
                 </p>
               </div>
             )}

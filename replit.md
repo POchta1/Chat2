@@ -25,7 +25,7 @@ This is a secure, real-time chat application built with React, Express, and Post
 ## Key Components
 
 ### Authentication & Security
-- **Secret Key System**: Registration requires pre-generated secret keys to control access
+- **Secret Key System**: 10 fixed secret keys for controlled registration (keys not visible to users)
 - **Session-based Authentication**: Express sessions for user authentication
 - **Password Hashing**: bcrypt for secure password storage
 - **Encryption Service**: Custom encryption for sensitive data using AES-256-GCM
@@ -53,11 +53,12 @@ This is a secure, real-time chat application built with React, Express, and Post
 ## Data Flow
 
 ### User Registration Flow
-1. User provides username, password, and secret key
-2. System validates secret key availability
+1. User provides username, password, and one of 10 secret keys
+2. System validates that the secret key exists and hasn't been used
 3. Password is hashed using bcrypt
 4. User record is created and secret key is marked as used
 5. User is automatically logged in
+6. Secret keys are never displayed to users (for maximum security)
 
 ### Message Flow
 1. User types message in chat interface

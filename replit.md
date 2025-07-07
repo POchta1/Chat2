@@ -123,6 +123,8 @@ This is a secure, real-time chat application built with React, Express, and Post
 ```
 Changelog:
 - July 07, 2025. Initial setup
+- July 07, 2025. Successfully migrated from Replit Agent to standard Replit environment
+- July 07, 2025. Fixed authentication redirect issue - users now automatically navigate to chat after login/registration
 ```
 
 ## User Preferences

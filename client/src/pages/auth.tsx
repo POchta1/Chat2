@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Eye, EyeOff, Check, X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,8 +20,16 @@ export default function AuthPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const { login, register } = useAuth();
+  const { login, register, isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const [location, setLocation] = useLocation();
+
+  // Redirect to chat if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      setLocation('/');
+    }
+  }, [isAuthenticated, setLocation]);
 
 
 
@@ -36,6 +45,10 @@ export default function AuthPage() {
             title: "Успешно!",
             description: result.message,
           });
+          // Force navigation to chat after successful login
+          setTimeout(() => {
+            setLocation('/');
+          }, 500);
         } else {
           toast({
             title: "Ошибка",
@@ -65,6 +78,10 @@ export default function AuthPage() {
             title: "Успешно!",
             description: result.message,
           });
+          // Force navigation to chat after successful registration
+          setTimeout(() => {
+            setLocation('/');
+          }, 500);
         } else {
           toast({
             title: "Ошибка",

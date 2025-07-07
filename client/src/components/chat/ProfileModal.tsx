@@ -21,6 +21,7 @@ export default function ProfileModal({ user, onClose }: ProfileModalProps) {
     avatar: user?.avatar || '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const { updateProfile } = useAuth();
   const { toast } = useToast();
 
@@ -50,8 +51,32 @@ export default function ProfileModal({ user, onClose }: ProfileModalProps) {
         updateData.password = formData.password;
       }
       
-      if (formData.avatar !== user?.avatar) {
-        updateData.avatar = formData.avatar;
+      // Handle avatar upload if a new file was selected
+      if (avatarFile) {
+        try {
+          const formDataUpload = new FormData();
+          formDataUpload.append('file', avatarFile);
+          
+          const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: formDataUpload,
+          });
+          
+          if (uploadResponse.ok) {
+            const uploadResult = await uploadResponse.json();
+            updateData.avatar = uploadResult.fileUrl;
+          } else {
+            throw new Error('Failed to upload avatar');
+          }
+        } catch (error) {
+          toast({
+            title: "Ошибка",
+            description: "Не удалось загрузить аватар",
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+          return;
+        }
       }
 
       if (Object.keys(updateData).length > 0) {
@@ -62,11 +87,12 @@ export default function ProfileModal({ user, onClose }: ProfileModalProps) {
             title: "Успешно!",
             description: result.message,
           });
-          // Reset password field after successful update
+          // Reset password field and avatar file after successful update
           setFormData(prev => ({
             ...prev,
             password: '',
           }));
+          setAvatarFile(null);
           onClose();
         } else {
           toast({
@@ -103,8 +129,19 @@ export default function ProfileModal({ user, onClose }: ProfileModalProps) {
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: "Ошибка",
+            description: "Размер файла не должен превышать 5MB",
+            variant: "destructive",
+          });
+          return;
+        }
+
         // Create a preview URL for the image
         const previewUrl = URL.createObjectURL(file);
+        setAvatarFile(file);
         setFormData(prev => ({
           ...prev,
           avatar: previewUrl,

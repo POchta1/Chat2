@@ -116,8 +116,17 @@ export function useAuth() {
         isLoading: false,
         isAuthenticated: false,
       });
+      // Принудительно перенаправляем на страницу аутентификации
+      window.location.href = '/auth';
     } catch (error) {
       console.error('Logout error:', error);
+      // Даже если произошла ошибка, перенаправляем на аутентификацию
+      setAuthState({
+        user: null,
+        isLoading: false,
+        isAuthenticated: false,
+      });
+      window.location.href = '/auth';
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Camera, Save, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,17 @@ export default function ProfileModal({ user, onClose }: ProfileModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { updateProfile } = useAuth();
   const { toast } = useToast();
+
+  // Update form data when user prop changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        username: user.username || '',
+        password: '',
+        avatar: user.avatar || '',
+      });
+    }
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +62,11 @@ export default function ProfileModal({ user, onClose }: ProfileModalProps) {
             title: "Успешно!",
             description: result.message,
           });
+          // Reset password field after successful update
+          setFormData(prev => ({
+            ...prev,
+            password: '',
+          }));
           onClose();
         } else {
           toast({

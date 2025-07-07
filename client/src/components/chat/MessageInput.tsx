@@ -94,9 +94,7 @@ export default function MessageInput({ onSendMessage, onTyping, onFileUpload }: 
           placeholder="Введите сообщение..."
           className="chat-input pr-10"
         />
-        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-          <Lock className="w-4 h-4" />
-        </div>
+
       </div>
       
       <Button

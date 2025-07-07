@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useWebSocket } from '@/hooks/useWebSocket';
+import { useWebSocket } from '@/hooks/useWebSocket_new';
 import { useQuery } from '@tanstack/react-query';
 import ChatSidebar from '@/components/chat/ChatSidebar';
 import ChatArea from '@/components/chat/ChatArea';
@@ -73,8 +73,10 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (lastMessage) {
+      console.log('Получено WebSocket сообщение:', lastMessage);
       switch (lastMessage.type) {
         case 'new_message':
+          console.log('Добавляем новое сообщение в чат:', lastMessage.message);
           setMessages(prev => [...prev, lastMessage.message]);
           break;
         case 'typing':
@@ -91,10 +93,13 @@ export default function ChatPage() {
   const handleSendMessage = (content: string, messageType = 'text', fileData?: any) => {
     if (!currentRoomId || !content.trim()) return;
 
+    console.log('Отправляем сообщение:', { content, messageType, roomId: currentRoomId });
+
     sendMessage({
       type: 'message',
-      content,
+      content: content, // Убираем шифрование - отправляем как есть
       messageType,
+      roomId: currentRoomId,
       fileUrl: fileData?.fileUrl,
       fileName: fileData?.fileName,
       fileSize: fileData?.fileSize,

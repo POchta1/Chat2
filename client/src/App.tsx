@@ -19,14 +19,12 @@ function Router() {
     );
   }
 
-  return (
-    <Switch>
-      <Route path="/">
-        {isAuthenticated ? <ChatPage /> : <AuthPage />}
-      </Route>
-      <Route component={NotFound} />
-    </Switch>
-  );
+  // Показываем чат если пользователь авторизован, иначе страницу авторизации
+  if (isAuthenticated) {
+    return <ChatPage />;
+  } else {
+    return <AuthPage />;
+  }
 }
 
 function App() {

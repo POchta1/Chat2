@@ -45,10 +45,10 @@ export default function AuthPage() {
             title: "Успешно!",
             description: result.message,
           });
-          // Force navigation to chat after successful login
+          // Принудительно обновляем страницу для отображения чата
           setTimeout(() => {
-            setLocation('/');
-          }, 500);
+            window.location.reload();
+          }, 1000);
         } else {
           toast({
             title: "Ошибка",
@@ -78,10 +78,10 @@ export default function AuthPage() {
             title: "Успешно!",
             description: result.message,
           });
-          // Force navigation to chat after successful registration
+          // Принудительно обновляем страницу для отображения чата
           setTimeout(() => {
-            setLocation('/');
-          }, 500);
+            window.location.reload();
+          }, 1000);
         } else {
           toast({
             title: "Ошибка",

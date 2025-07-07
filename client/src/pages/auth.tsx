@@ -1,29 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Eye, EyeOff } from 'lucide-react';
+import { Shield, Eye, EyeOff, Check, X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-
-const SECRET_KEYS = [
-  "SK-7H9J2K8L3M4N5P6Q",
-  "SK-R2T4Y6U8I9O0P1A3",
-  "SK-S5D7F9G1H3J4K6L8",
-  "SK-Z9X8C7V6B5N4M3Q2",
-  "SK-W1E3R5T7Y9U2I4O6",
-  "SK-P8O9I0U7Y6T5R4E3",
-  "SK-A2S4D6F8G9H1J3K5",
-  "SK-L7Z9X2C4V6B8N0M1",
-  "SK-Q3W5E7R9T1Y3U5I7",
-  "SK-O9P1A3S5D7F9G2H4"
-];
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
-  const [showKeys, setShowKeys] = useState(false);
+  const [showWords, setShowWords] = useState(false);
+  const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -35,10 +23,19 @@ export default function AuthPage() {
   const { login, register } = useAuth();
   const { toast } = useToast();
 
-  const { data: availableKeys = [] } = useQuery({
-    queryKey: ['/api/secret-keys'],
+  const { data: availableWords = [] } = useQuery({
+    queryKey: ['/api/secret-words'],
     enabled: !isLogin,
   });
+
+  // Обновляем секретный ключ когда выбираются слова
+  useEffect(() => {
+    if (selectedWords.length === 10) {
+      setFormData(prev => ({ ...prev, secretKey: selectedWords.join('-') }));
+    } else {
+      setFormData(prev => ({ ...prev, secretKey: '' }));
+    }
+  }, [selectedWords]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,6 +104,26 @@ export default function AuthPage() {
     }));
   };
 
+  const handleWordClick = (word: string) => {
+    if (selectedWords.includes(word)) {
+      // Убираем слово из выбранных
+      setSelectedWords(prev => prev.filter(w => w !== word));
+    } else if (selectedWords.length < 10) {
+      // Добавляем слово к выбранным
+      setSelectedWords(prev => [...prev, word]);
+    } else {
+      toast({
+        title: "Внимание",
+        description: "Можно выбрать только 10 слов",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const clearSelectedWords = () => {
+    setSelectedWords([]);
+  };
+
   return (
     <div className="auth-container">
       <Card className="auth-card">
@@ -124,22 +141,65 @@ export default function AuthPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div>
-                <Label htmlFor="secretKey" className="text-sm font-medium text-gray-300">
-                  Секретный ключ
+                <Label className="text-sm font-medium text-gray-300">
+                  Выберите 10 слов для создания секретного ключа
                 </Label>
-                <Input
-                  id="secretKey"
-                  name="secretKey"
-                  type="text"
-                  value={formData.secretKey}
-                  onChange={handleInputChange}
-                  className="chat-input font-mono"
-                  placeholder="Введите секретный ключ"
-                  required={!isLogin}
-                />
-                <p className="text-xs text-gray-400 mt-1">
-                  Для регистрации требуется один из {availableKeys.length} доступных ключей
-                </p>
+                
+                {/* Выбранные слова */}
+                <div className="bg-slate-700 rounded-lg p-3 mb-3 min-h-[60px]">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-gray-300">
+                      Выбрано: {selectedWords.length}/10
+                    </span>
+                    {selectedWords.length > 0 && (
+                      <Button
+                        onClick={clearSelectedWords}
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-400 hover:text-red-300 text-xs"
+                      >
+                        <X className="w-3 h-3 mr-1" />
+                        Очистить
+                      </Button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedWords.map((word, index) => (
+                      <span
+                        key={index}
+                        className="bg-blue-600 text-white px-2 py-1 rounded text-sm cursor-pointer hover:bg-blue-500"
+                        onClick={() => handleWordClick(word)}
+                      >
+                        {word} <X className="w-3 h-3 inline ml-1" />
+                      </span>
+                    ))}
+                  </div>
+                  {selectedWords.length === 0 && (
+                    <p className="text-gray-400 text-sm text-center">
+                      Выберите слова из списка ниже
+                    </p>
+                  )}
+                </div>
+
+                {/* Кнопка показать/скрыть слова */}
+                <Button
+                  type="button"
+                  onClick={() => setShowWords(!showWords)}
+                  variant="outline"
+                  className="w-full mb-3 bg-slate-700 hover:bg-slate-600 text-gray-300 border-slate-600"
+                >
+                  {showWords ? (
+                    <>
+                      <EyeOff className="w-4 h-4 mr-2" />
+                      Скрыть слова
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="w-4 h-4 mr-2" />
+                      Показать доступные слова
+                    </>
+                  )}
+                </Button>
               </div>
             )}
 
@@ -198,10 +258,16 @@ export default function AuthPage() {
               className={`w-full py-3 font-semibold transition-colors ${
                 isLogin ? 'chat-button primary' : 'chat-button success'
               }`}
-              disabled={isSubmitting}
+              disabled={isSubmitting || (!isLogin && selectedWords.length !== 10)}
             >
               {isSubmitting ? 'Подождите...' : (isLogin ? 'Войти' : 'Зарегистрироваться')}
             </Button>
+            
+            {!isLogin && selectedWords.length !== 10 && (
+              <p className="text-sm text-yellow-400 text-center">
+                Выберите ровно 10 слов для регистрации
+              </p>
+            )}
           </form>
 
           <Button
@@ -212,43 +278,35 @@ export default function AuthPage() {
             {isLogin ? 'Регистрация' : 'Назад к входу'}
           </Button>
 
-          {!isLogin && (
-            <div className="mt-8 p-4 bg-slate-800 rounded-lg border border-slate-600">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-300">
-                  Секретные ключи для регистрации:
-                </h3>
-                <Button
-                  onClick={() => setShowKeys(!showKeys)}
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs text-blue-400 hover:text-blue-300"
-                >
-                  {showKeys ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </Button>
+          {!isLogin && showWords && (
+            <div className="mt-4 p-4 bg-slate-800 rounded-lg border border-slate-600">
+              <h3 className="text-sm font-semibold text-gray-300 mb-3">
+                Доступные слова для выбора:
+              </h3>
+              
+              <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto">
+                {availableWords.map((word, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleWordClick(word)}
+                    className={`px-3 py-2 rounded text-sm font-medium transition-all ${
+                      selectedWords.includes(word)
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                    }`}
+                  >
+                    {word}
+                    {selectedWords.includes(word) && (
+                      <Check className="w-3 h-3 inline ml-1" />
+                    )}
+                  </button>
+                ))}
               </div>
               
-              {showKeys && (
-                <div className="space-y-1 text-xs font-mono text-gray-400">
-                  {SECRET_KEYS.map((key, index) => (
-                    <div
-                      key={index}
-                      className={`px-2 py-1 rounded cursor-pointer transition-colors ${
-                        availableKeys.includes(key) 
-                          ? 'bg-slate-700 hover:bg-slate-600' 
-                          : 'bg-red-900/20 text-red-400 line-through'
-                      }`}
-                      onClick={() => {
-                        if (availableKeys.includes(key)) {
-                          setFormData(prev => ({ ...prev, secretKey: key }));
-                        }
-                      }}
-                    >
-                      {key} {!availableKeys.includes(key) && '(использован)'}
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div className="mt-3 text-xs text-gray-400 text-center">
+                Нажмите на слова для выбора. Нужно выбрать ровно 10 слов.
+              </div>
             </div>
           )}
         </CardContent>

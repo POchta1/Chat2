@@ -144,28 +144,35 @@ export class MemStorage implements IStorage {
   }
 
   async initializeSecretKeys(): Promise<void> {
-    const keys = [
-      "SK-7H9J2K8L3M4N5P6Q",
-      "SK-R2T4Y6U8I9O0P1A3",
-      "SK-S5D7F9G1H3J4K6L8",
-      "SK-Z9X8C7V6B5N4M3Q2",
-      "SK-W1E3R5T7Y9U2I4O6",
-      "SK-P8O9I0U7Y6T5R4E3",
-      "SK-A2S4D6F8G9H1J3K5",
-      "SK-L7Z9X2C4V6B8N0M1",
-      "SK-Q3W5E7R9T1Y3U5I7",
-      "SK-O9P1A3S5D7F9G2H4"
+    // Создаем список слов для выбора
+    const words = [
+      "солнце", "море", "дом", "мир", "свет", "небо", "земля", "вода", "огонь", "ветер",
+      "лес", "гора", "река", "город", "дорога", "звезда", "луна", "цветок", "дерево", "трава",
+      "птица", "рыба", "кот", "собака", "конь", "волк", "медведь", "лиса", "заяц", "белка",
+      "книга", "письмо", "слово", "музыка", "песня", "танец", "смех", "радость", "счастье", "любовь",
+      "друг", "семья", "мама", "папа", "брат", "сестра", "дедушка", "бабушка", "ребенок", "человек",
+      "работа", "учеба", "школа", "дом", "квартира", "комната", "кухня", "спальня", "окно", "дверь"
     ];
 
-    keys.forEach(key => {
+    // Генерируем несколько наборов по 10 слов для регистрации
+    const secretKeySets = [
+      words.slice(0, 10),   // первые 10 слов
+      words.slice(10, 20),  // следующие 10 слов
+      words.slice(20, 30),  // и так далее
+      words.slice(30, 40),
+      words.slice(40, 50),
+    ];
+
+    secretKeySets.forEach((wordSet, index) => {
+      const keyString = wordSet.join("-");
       const secretKey: SecretKey = {
         id: this.currentSecretKeyId++,
-        key,
+        key: keyString,
         isUsed: false,
         usedBy: null,
         createdAt: new Date(),
       };
-      this.secretKeys.set(key, secretKey);
+      this.secretKeys.set(keyString, secretKey);
     });
   }
 

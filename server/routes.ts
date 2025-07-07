@@ -182,6 +182,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploaded files
   app.use("/uploads", express.static(uploadDir));
 
+  // API endpoint для получения доступных слов
+  app.get("/api/secret-words", async (req, res) => {
+    try {
+      const allWords = storage.getAvailableWords();
+      // Перемешиваем слова и выбираем случайные 50 для показа
+      const shuffled = [...allWords].sort(() => 0.5 - Math.random());
+      const selectedWords = shuffled.slice(0, 50);
+      res.json(selectedWords);
+    } catch (error) {
+      console.error("Error fetching available words:", error);
+      res.status(500).json({ message: "Failed to fetch available words" });
+    }
+  });
+
   // Authentication routes
   app.post("/api/auth/register", async (req, res) => {
     try {

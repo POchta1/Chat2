@@ -1,0 +1,111 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "testuser",
+      "password": "$2b$10$oJPZPyYVLt47NY6.jJd3VOGcdf0dXli/KglfGs8kLsfx5OklXt/s2",
+      "avatar": null,
+      "createdAt": "2025-07-07T18:43:13.824Z",
+      "isOnline": false
+    }
+  ],
+  "secretKeys": [
+    {
+      "id": 1,
+      "key": "SECRET_KEY_001",
+      "isUsed": true,
+      "createdAt": "2025-07-07T18:42:31.744Z",
+      "usedAt": "2025-07-07T18:43:13.824Z",
+      "usedBy": 1
+    },
+    {
+      "id": 2,
+      "key": "SECRET_KEY_002",
+      "isUsed": false,
+      "createdAt": "2025-07-07T18:42:31.744Z",
+      "usedAt": null,
+      "usedBy": null
+    },
+    {
+      "id": 3,
+      "key": "SECRET_KEY_003",
+      "isUsed": false,
+      "createdAt": "2025-07-07T18:42:31.744Z",
+      "usedAt": null,
+      "usedBy": null
+    },
+    {
+      "id": 4,
+      "key": "SECRET_KEY_004",
+      "isUsed": false,
+      "createdAt": "2025-07-07T18:42:31.744Z",
+      "usedAt": null,
+      "usedBy": null
+    },
+    {
+      "id": 5,
+      "key": "SECRET_KEY_005",
+      "isUsed": false,
+      "createdAt": "2025-07-07T18:42:31.744Z",
+      "usedAt": null,
+      "usedBy": null
+    },
+    {
+      "id": 6,
+      "key": "SECRET_KEY_006",
+      "isUsed": false,
+      "createdAt": "2025-07-07T18:42:31.744Z",
+      "usedAt": null,
+      "usedBy": null
+    },
+    {
+      "id": 7,
+      "key": "SECRET_KEY_007",
+      "isUsed": false,
+      "createdAt": "2025-07-07T18:42:31.744Z",
+      "usedAt": null,
+      "usedBy": null
+    },
+    {
+      "id": 8,
+      "key": "SECRET_KEY_008",
+      "isUsed": false,
+      "createdAt": "2025-07-07T18:42:31.744Z",
+      "usedAt": null,
+      "usedBy": null
+    },
+    {
+      "id": 9,
+      "key": "SECRET_KEY_009",
+      "isUsed": false,
+      "createdAt": "2025-07-07T18:42:31.744Z",
+      "usedAt": null,
+      "usedBy": null
+    },
+    {
+      "id": 10,
+      "key": "SECRET_KEY_010",
+      "isUsed": false,
+      "createdAt": "2025-07-07T18:42:31.744Z",
+      "usedAt": null,
+      "usedBy": null
+    }
+  ],
+  "chatRooms": [
+    {
+      "id": 1,
+      "name": "Общий чат",
+      "isGeneral": true,
+      "createdAt": "2025-07-07T18:42:31.600Z"
+    }
+  ],
+  "messages": [],
+  "roomMembers": [],
+  "typingIndicators": [],
+  "counters": {
+    "userId": 2,
+    "roomId": 2,
+    "messageId": 1,
+    "secretKeyId": 11
+  }
+}

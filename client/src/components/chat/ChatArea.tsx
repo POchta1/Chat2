@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Phone, Video, MoreVertical, Shield, Lock, Settings, Users, UserPlus, Info } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -33,6 +34,7 @@ export default function ChatArea({
 }: ChatAreaProps) {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,6 +53,24 @@ export default function ChatArea({
 
   const isOwnMessage = (message: Message) => {
     return message.senderId === currentUser?.id;
+  };
+
+  const handleVideoCall = () => {
+    toast({
+      title: "Видеозвонок",
+      description: `Начинаем видеозвонок в чате "${room?.name}"`,
+    });
+    // Here you would implement actual video call functionality
+    // For now, we'll just show a notification
+  };
+
+  const handleAudioCall = () => {
+    toast({
+      title: "Аудиозвонок", 
+      description: `Начинаем аудиозвонок в чате "${room?.name}"`,
+    });
+    // Here you would implement actual audio call functionality
+    // For now, we'll just show a notification
   };
 
   const renderMessage = (message: Message) => {
@@ -188,6 +208,8 @@ export default function ChatArea({
               variant="ghost"
               size="sm"
               className="text-gray-400 hover:text-white"
+              onClick={handleVideoCall}
+              title="Видеозвонок"
             >
               <Video className="w-4 h-4" />
             </Button>
@@ -195,6 +217,8 @@ export default function ChatArea({
               variant="ghost"
               size="sm"
               className="text-gray-400 hover:text-white"
+              onClick={handleAudioCall}
+              title="Аудиозвонок"
             >
               <Phone className="w-4 h-4" />
             </Button>

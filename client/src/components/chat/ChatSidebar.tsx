@@ -3,6 +3,7 @@ import { User, LogOut, Settings, Plus, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LogoutConfirmModal from './LogoutConfirmModal';
+import NewChatModal from './NewChatModal';
 import type { ChatRoom } from '@/pages/chat';
 import type { User as UserType } from '@/hooks/useAuth';
 
@@ -12,6 +13,7 @@ interface ChatSidebarProps {
   onRoomSelect: (roomId: number) => void;
   onProfileClick: () => void;
   onLogout: () => void;
+  onCreateChat: (chatName: string) => void;
   user: UserType | null;
 }
 
@@ -21,9 +23,11 @@ export default function ChatSidebar({
   onRoomSelect, 
   onProfileClick, 
   onLogout, 
+  onCreateChat,
   user 
 }: ChatSidebarProps) {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showNewChatModal, setShowNewChatModal] = useState(false);
 
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
@@ -32,6 +36,14 @@ export default function ChatSidebar({
   const handleLogoutConfirm = () => {
     setShowLogoutModal(false);
     onLogout();
+  };
+
+  const handleNewChatClick = () => {
+    setShowNewChatModal(true);
+  };
+
+  const handleCreateChat = (chatName: string) => {
+    onCreateChat(chatName);
   };
   return (
     <div className="chat-sidebar">
@@ -111,7 +123,10 @@ export default function ChatSidebar({
       {/* Quick Actions */}
       <div className="p-4 border-t border-slate-700">
         <div className="flex space-x-2">
-          <Button className="flex-1 chat-button primary">
+          <Button 
+            onClick={handleNewChatClick}
+            className="flex-1 chat-button primary bg-blue-600 hover:bg-blue-700 text-white"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Новый чат
           </Button>
@@ -129,6 +144,12 @@ export default function ChatSidebar({
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
         onConfirm={handleLogoutConfirm}
+      />
+      
+      <NewChatModal
+        isOpen={showNewChatModal}
+        onClose={() => setShowNewChatModal(false)}
+        onCreateChat={handleCreateChat}
       />
     </div>
   );

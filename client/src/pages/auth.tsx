@@ -146,7 +146,7 @@ export default function AuthPage() {
                 </Label>
                 
                 {/* Выбранные слова */}
-                <div className="bg-slate-700 rounded-lg p-3 mb-3 min-h-[60px]">
+                <div className="bg-slate-800 border border-slate-600 rounded-lg p-3 mb-3 min-h-[60px]">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-gray-300">
                       Выбрано: {selectedWords.length}/10
@@ -167,7 +167,7 @@ export default function AuthPage() {
                     {selectedWords.map((word, index) => (
                       <span
                         key={index}
-                        className="bg-blue-600 text-white px-2 py-1 rounded text-sm cursor-pointer hover:bg-blue-500"
+                        className="bg-blue-600 text-white px-2 py-1 rounded text-sm cursor-pointer hover:bg-blue-500 border border-blue-500"
                         onClick={() => handleWordClick(word)}
                       >
                         {word} <X className="w-3 h-3 inline ml-1" />
@@ -186,7 +186,7 @@ export default function AuthPage() {
                   type="button"
                   onClick={() => setShowWords(!showWords)}
                   variant="outline"
-                  className="w-full mb-3 bg-slate-700 hover:bg-slate-600 text-gray-300 border-slate-600"
+                  className="w-full mb-3 bg-slate-800 hover:bg-slate-700 text-gray-300 border-slate-600 hover:border-slate-500"
                 >
                   {showWords ? (
                     <>
@@ -213,7 +213,7 @@ export default function AuthPage() {
                 type="text"
                 value={formData.username}
                 onChange={handleInputChange}
-                className="chat-input"
+                className="bg-slate-800 border-slate-600 text-gray-100 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
                 placeholder={isLogin ? "Введите имя пользователя" : "Выберите имя пользователя"}
                 required
               />
@@ -229,7 +229,7 @@ export default function AuthPage() {
                 type="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="chat-input"
+                className="bg-slate-800 border-slate-600 text-gray-100 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
                 placeholder={isLogin ? "Введите пароль" : "Создайте пароль"}
                 required
               />
@@ -246,7 +246,7 @@ export default function AuthPage() {
                   type="password"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="chat-input"
+                  className="bg-slate-800 border-slate-600 text-gray-100 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="Подтвердите пароль"
                   required
                 />
@@ -290,10 +290,10 @@ export default function AuthPage() {
                     key={index}
                     type="button"
                     onClick={() => handleWordClick(word)}
-                    className={`px-3 py-2 rounded text-sm font-medium transition-all ${
+                    className={`px-3 py-2 rounded text-sm font-medium transition-all border ${
                       selectedWords.includes(word)
-                        ? 'bg-blue-600 text-white shadow-md'
-                        : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                        ? 'bg-blue-600 text-white shadow-md border-blue-500'
+                        : 'bg-slate-700 text-gray-300 hover:bg-slate-600 border-slate-600 hover:border-slate-500'
                     }`}
                   >
                     {word}

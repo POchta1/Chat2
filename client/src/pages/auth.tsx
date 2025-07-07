@@ -22,10 +22,7 @@ export default function AuthPage() {
   const { login, register } = useAuth();
   const { toast } = useToast();
 
-  const { data: availableKeys = [] } = useQuery({
-    queryKey: ['/api/secret-keys'],
-    enabled: !isLogin,
-  });
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,7 +122,7 @@ export default function AuthPage() {
                   required={!isLogin}
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  Для регистрации требуется один из {availableKeys.length} доступных ключей
+                  Для регистрации требуется секретный ключ
                 </p>
               </div>
             )}
@@ -199,39 +196,7 @@ export default function AuthPage() {
             {isLogin ? 'Регистрация' : 'Назад к входу'}
           </Button>
 
-          {!isLogin && (
-            <div className="mt-4 p-4 bg-slate-800 rounded-lg border border-slate-600">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-300">
-                  Секретные ключи для регистрации:
-                </h3>
-                <Button
-                  onClick={() => setShowKeys(!showKeys)}
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs text-blue-400 hover:text-blue-300"
-                >
-                  {showKeys ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </Button>
-              </div>
-              
-              {showKeys && (
-                <div className="space-y-1 text-xs font-mono text-gray-400">
-                  {availableKeys.map((key, index) => (
-                    <div
-                      key={index}
-                      className="px-2 py-1 rounded cursor-pointer transition-colors bg-slate-700 hover:bg-slate-600"
-                      onClick={() => {
-                        setFormData(prev => ({ ...prev, secretKey: key }));
-                      }}
-                    >
-                      {key}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+
         </CardContent>
       </Card>
     </div>

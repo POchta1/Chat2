@@ -182,16 +182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploaded files
   app.use("/uploads", express.static(uploadDir));
 
-  // API endpoint для получения доступных ключей
-  app.get("/api/secret-keys", async (req, res) => {
-    try {
-      const keys = storage.getAvailableKeys();
-      res.json(keys);
-    } catch (error) {
-      console.error("Error fetching available keys:", error);
-      res.status(500).json({ message: "Failed to fetch available keys" });
-    }
-  });
+
 
   // Authentication routes
   app.post("/api/auth/register", async (req, res) => {

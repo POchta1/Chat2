@@ -64,6 +64,10 @@ export function useAuth() {
           isLoading: false,
           isAuthenticated: true,
         });
+        // Принудительно обновляем состояние приложения
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 100);
         return { success: true, message: data.message };
       } else {
         const errorData = await response.json();
@@ -90,6 +94,10 @@ export function useAuth() {
           isLoading: false,
           isAuthenticated: true,
         });
+        // Принудительно обновляем состояние приложения
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 100);
         return { success: true, message: data.message };
       } else {
         const errorData = await response.json();

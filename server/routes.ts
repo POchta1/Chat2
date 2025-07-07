@@ -267,14 +267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Endpoint to get available secret keys for registration (for development)
-  app.get("/api/auth/available-keys", (req, res) => {
-    const availableKeys = storage.getAvailableKeys();
-    res.json({ 
-      availableKeys: availableKeys.slice(0, 3), // Show only first 3 for security
-      total: availableKeys.length 
-    });
-  });
+
 
   // User routes
   app.put("/api/users/profile", authenticateToken, async (req: AuthenticatedRequest, res) => {

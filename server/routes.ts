@@ -304,6 +304,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/chat/rooms", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { name } = req.body;
+      
+      if (!name || typeof name !== 'string' || !name.trim()) {
+        return res.status(400).json({ message: "Название чата обязательно" });
+      }
+
+      const room = await storage.createChatRoom(name.trim());
+      
+      // Автоматически добавляем создателя в комнату
+      if (req.user) {
+        await storage.joinRoom(req.user.id, room.id);
+      }
+
+      res.json({ 
+        message: "Чат создан успешно", 
+        room 
+      });
+    } catch (error: any) {
+      console.error("Error creating room:", error);
+      res.status(500).json({ message: "Не удалось создать чат" });
+    }
+  });
+
   app.get("/api/chat/messages/:roomId", authenticateToken, async (req: AuthenticatedRequest, res) => {
     try {
       const roomId = parseInt(req.params.roomId);

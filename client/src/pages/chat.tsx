@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useWebSocket } from '@/hooks/useWebSocket_new';
 import { useQuery } from '@tanstack/react-query';
+import { queryClient } from '@/lib/queryClient';
 import ChatSidebar from '@/components/chat/ChatSidebar';
 import ChatArea from '@/components/chat/ChatArea';
 import ProfileModal from '@/components/chat/ProfileModal';
@@ -115,6 +116,29 @@ export default function ChatPage() {
     });
   };
 
+  const handleCreateChat = async (chatName: string) => {
+    try {
+      const response = await fetch('/api/chat/rooms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: chatName }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const newRoom = await response.json();
+        // Обновляем список комнат
+        queryClient.invalidateQueries({ queryKey: ['/api/chat/rooms'] });
+        // Переключаемся на новую комнату
+        setCurrentRoomId(newRoom.room.id);
+      }
+    } catch (error) {
+      console.error('Ошибка создания чата:', error);
+    }
+  };
+
   const currentRoom = rooms.find(room => room.id === currentRoomId);
 
   return (
@@ -125,6 +149,7 @@ export default function ChatPage() {
         onRoomSelect={setCurrentRoomId}
         onProfileClick={() => setShowProfileModal(true)}
         onLogout={logout}
+        onCreateChat={handleCreateChat}
         user={user}
       />
       

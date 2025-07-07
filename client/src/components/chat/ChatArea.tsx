@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { Phone, Video, MoreVertical, Shield, Lock } from 'lucide-react';
+import { Phone, Video, MoreVertical, Shield, Lock, Settings, Users, UserPlus, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import MessageInput from './MessageInput';
+import ChatSettingsModal from './ChatSettingsModal';
 import type { Message, ChatRoom } from '@/pages/chat';
 import type { User } from '@/hooks/useAuth';
 
@@ -14,6 +16,8 @@ interface ChatAreaProps {
   onTyping: (isTyping: boolean) => void;
   onFileUpload: () => void;
   currentUser: User | null;
+  onUpdateRoom?: (roomId: number, data: { name?: string }) => void;
+  onDeleteRoom?: (roomId: number) => void;
 }
 
 export default function ChatArea({
@@ -24,7 +28,10 @@ export default function ChatArea({
   onTyping,
   onFileUpload,
   currentUser,
+  onUpdateRoom,
+  onDeleteRoom,
 }: ChatAreaProps) {
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -191,13 +198,43 @@ export default function ChatArea({
             >
               <Phone className="w-4 h-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-400 hover:text-white"
-            >
-              <MoreVertical className="w-4 h-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-400 hover:text-white"
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-slate-800 border-slate-600 text-white">
+                <DropdownMenuItem 
+                  onClick={() => setShowSettingsModal(true)}
+                  className="cursor-pointer hover:bg-slate-700"
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Настройки чата</span>
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem className="cursor-pointer hover:bg-slate-700">
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>Участники ({messages.filter((m, i, arr) => arr.findIndex(msg => msg.senderId === m.senderId) === i).length})</span>
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator className="bg-slate-600" />
+                
+                <DropdownMenuItem className="cursor-pointer hover:bg-slate-700">
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  <span>Пригласить пользователя</span>
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem className="cursor-pointer hover:bg-slate-700">
+                  <Info className="mr-2 h-4 w-4" />
+                  <span>Информация о чате</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
@@ -236,6 +273,16 @@ export default function ChatArea({
           <span>Нажмите Enter для отправки</span>
         </div>
       </div>
+
+      {showSettingsModal && room && (
+        <ChatSettingsModal
+          isOpen={showSettingsModal}
+          onClose={() => setShowSettingsModal(false)}
+          room={room}
+          onUpdateRoom={onUpdateRoom}
+          onDeleteRoom={onDeleteRoom}
+        />
+      )}
     </div>
   );
 }

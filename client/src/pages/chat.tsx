@@ -139,6 +139,44 @@ export default function ChatPage() {
     }
   };
 
+  const handleUpdateRoom = async (roomId: number, data: { name?: string }) => {
+    try {
+      const response = await fetch(`/api/chat/rooms/${roomId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        // Обновляем список комнат
+        queryClient.invalidateQueries({ queryKey: ['/api/chat/rooms'] });
+      }
+    } catch (error) {
+      console.error('Ошибка обновления чата:', error);
+    }
+  };
+
+  const handleDeleteRoom = async (roomId: number) => {
+    try {
+      const response = await fetch(`/api/chat/rooms/${roomId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        // Обновляем список комнат
+        queryClient.invalidateQueries({ queryKey: ['/api/chat/rooms'] });
+        // Переключаемся на общий чат
+        setCurrentRoomId(1);
+      }
+    } catch (error) {
+      console.error('Ошибка удаления чата:', error);
+    }
+  };
+
   const currentRoom = rooms.find(room => room.id === currentRoomId);
 
   return (
@@ -161,6 +199,8 @@ export default function ChatPage() {
         onTyping={handleTyping}
         onFileUpload={() => setShowFileUploadModal(true)}
         currentUser={user}
+        onUpdateRoom={handleUpdateRoom}
+        onDeleteRoom={handleDeleteRoom}
       />
 
       {showProfileModal && (

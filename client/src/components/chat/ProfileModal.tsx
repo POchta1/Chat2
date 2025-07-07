@@ -96,6 +96,29 @@ export default function ProfileModal({ user, onClose }: ProfileModalProps) {
     }));
   };
 
+  const handleAvatarChange = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // Create a preview URL for the image
+        const previewUrl = URL.createObjectURL(file);
+        setFormData(prev => ({
+          ...prev,
+          avatar: previewUrl,
+        }));
+        
+        toast({
+          title: "Аватар загружен",
+          description: "Аватар будет сохранен при нажатии кнопки 'Сохранить'",
+        });
+      }
+    };
+    input.click();
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-slate-800 rounded-2xl p-6 w-full max-w-md border border-slate-700">
@@ -123,7 +146,9 @@ export default function ProfileModal({ user, onClose }: ProfileModalProps) {
               </Avatar>
               <Button
                 type="button"
+                onClick={handleAvatarChange}
                 className="absolute bottom-0 right-0 chat-button primary p-2 rounded-full"
+                title="Изменить аватар"
               >
                 <Camera className="w-4 h-4" />
               </Button>

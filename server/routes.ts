@@ -349,32 +349,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get secret keys (for registration form)
-  app.get("/api/secret-keys", async (req, res) => {
+  // Get available words for secret key generation
+  app.get("/api/secret-words", async (req, res) => {
     try {
-      const keys = [
-        "SK-7H9J2K8L3M4N5P6Q",
-        "SK-R2T4Y6U8I9O0P1A3", 
-        "SK-S5D7F9G1H3J4K6L8",
-        "SK-Z9X8C7V6B5N4M3Q2",
-        "SK-W1E3R5T7Y9U2I4O6",
-        "SK-P8O9I0U7Y6T5R4E3",
-        "SK-A2S4D6F8G9H1J3K5",
-        "SK-L7Z9X2C4V6B8N0M1",
-        "SK-Q3W5E7R9T1Y3U5I7",
-        "SK-O9P1A3S5D7F9G2H4"
+      const words = [
+        "солнце", "море", "дом", "мир", "свет", "небо", "земля", "вода", "огонь", "ветер",
+        "лес", "гора", "река", "город", "дорога", "звезда", "луна", "цветок", "дерево", "трава",
+        "птица", "рыба", "кот", "собака", "конь", "волк", "медведь", "лиса", "заяц", "белка",
+        "книга", "письмо", "слово", "музыка", "песня", "танец", "смех", "радость", "счастье", "любовь",
+        "друг", "семья", "мама", "папа", "брат", "сестра", "дедушка", "бабушка", "ребенок", "человек",
+        "работа", "учеба", "школа", "хлеб", "квартира", "комната", "кухня", "спальня", "окно", "дверь"
       ];
       
-      // Check which keys are still available
-      const availableKeys = [];
-      for (const key of keys) {
-        const isAvailable = await storage.validateSecretKey(key);
-        if (isAvailable) {
-          availableKeys.push(key);
-        }
+      res.json(words);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Validate generated secret key
+  app.post("/api/validate-secret-key", async (req, res) => {
+    try {
+      const { words } = req.body;
+      
+      if (!words || !Array.isArray(words) || words.length !== 10) {
+        return res.status(400).json({ message: "Нужно выбрать ровно 10 слов" });
       }
       
-      res.json(availableKeys);
+      const secretKey = words.join("-");
+      const isValid = await storage.validateSecretKey(secretKey);
+      
+      res.json({ isValid, secretKey });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

@@ -45,10 +45,7 @@ export default function AuthPage() {
             title: "Успешно!",
             description: result.message,
           });
-          // Принудительно обновляем страницу для отображения чата
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          // Перенаправление происходит автоматически в useAuth
         } else {
           toast({
             title: "Ошибка",
@@ -78,10 +75,7 @@ export default function AuthPage() {
             title: "Успешно!",
             description: result.message,
           });
-          // Принудительно обновляем страницу для отображения чата
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          // Перенаправление происходит автоматически в useAuth
         } else {
           toast({
             title: "Ошибка",

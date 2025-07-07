@@ -21,11 +21,9 @@ function Router() {
 
   return (
     <Switch>
-      {isAuthenticated ? (
-        <Route path="/" component={ChatPage} />
-      ) : (
-        <Route path="/" component={AuthPage} />
-      )}
+      <Route path="/">
+        {isAuthenticated ? <ChatPage /> : <AuthPage />}
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
